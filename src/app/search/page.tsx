@@ -9,6 +9,27 @@ import { debounce } from 'lodash';
 import React, { useEffect, useState } from 'react';
 
 const Search = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const {
+    data: searchResults,
+    isLoading,
+    isError,
+  } = useSearchQuery(searchTerm, {
+    skip: searchTerm.length < 3, // 쿼리가 3자 미만이면 실행하지 않음
+  });
+
+  const handleSearch = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value);
+    },
+    500
+  );
+
+  // console.log(searchResults);
+
+  useEffect(() => {
+    return handleSearch.cancel;
+  }, [handleSearch.cancel]);
   return (
     <div className="p-8">
       <Header name="Search" />
@@ -53,22 +74,3 @@ const Search = () => {
 };
 
 export default Search;
-
-const [searchTerm, setSearchTerm] = useState('');
-const {
-  data: searchResults,
-  isLoading,
-  isError,
-} = useSearchQuery(searchTerm, {
-  skip: searchTerm.length < 3, // 쿼리가 3자 미만이면 실행하지 않음
-});
-
-const handleSearch = debounce((event: React.ChangeEvent<HTMLInputElement>) => {
-  setSearchTerm(event.target.value);
-}, 500);
-
-// console.log(searchResults);
-
-useEffect(() => {
-  return handleSearch.cancel;
-}, [handleSearch.cancel]);
